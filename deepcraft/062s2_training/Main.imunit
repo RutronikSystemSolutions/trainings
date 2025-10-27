@@ -1,0 +1,56 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<Imaginet version="2.0.0.0">
+  <Compound unit="d419d86b-7b57-41d3-9a74-ab428f13a213">
+    <Nodes>
+      <DotNetNode id="node_15" x="733.1517664101407" y="429.6871815301042" enabled="true" profiling="false" name="conv1dlstm-medium-balanced-2 preprocessor">
+        <Interop assembly="Imaginet.Units.KerasModel" class="Imaginet.Units.KerasModel.KerasModel" method="LoadPreprocessor" />
+        <Input param="input" type="Tensor" />
+        <Input param="File" type="FileReference">
+          <StringArgument>C:/rutronik/imagimob/062s2_radar_gesture/trained_models/conv1dlstm-medium-balanced-2/conv1dlstm-medium-balanced-2.h5</StringArgument>
+        </Input>
+        <Output param="output" type="Tensor" />
+      </DotNetNode>
+      <UnitNode id="node_6" x="1277.2893852421912" y="308.36531643277493" enabled="true" profiling="false" name="Model data" unit="ImagimobStudio.Modules.DataTrack" />
+      <LabelListNode id="node_2" width="115.68333333333334" height="100" x="602.2094531791857" y="111.0376614827361" enabled="true" profiling="false" name="Predefined Labels">
+        <Label>click</Label>
+        <Label>left</Label>
+        <Label>right</Label>
+      </LabelListNode>
+      <UnitNode id="node_1" x="765.2" y="298" enabled="true" profiling="false" name="Radar Data" unit="ImagimobStudio.Modules.DataTrack" />
+      <DotNetNode id="node_16" x="769.3672485287462" y="578.0248909008602" enabled="true" profiling="false" name="conv1dlstm-medium-balanced-2 model">
+        <Interop assembly="Imaginet.Units.KerasModel" class="Imaginet.Units.KerasModel.KerasModel" method="LoadNetwork" />
+        <Input param="input" type="Tensor" />
+        <Input param="File" type="FileReference">
+          <StringArgument>C:/rutronik/imagimob/062s2_radar_gesture/trained_models/conv1dlstm-medium-balanced-2/conv1dlstm-medium-balanced-2.h5</StringArgument>
+        </Input>
+        <Output param="output" type="Tensor" />
+      </DotNetNode>
+      <UnitNode id="node_5" x="1281.8163205070161" y="436.0248909008602" enabled="true" profiling="false" name="Model labels" unit="ImagimobStudio.Modules.LabelTrack" />
+      <DeviceNode id="node_0" x="448.40941602535077" y="336.93635129017656" enabled="true" profiling="false" name="Radar" board="290de5cb-460b-41bf-f484-8c17112faff5" boardName="PSOC 6 AI (CY8CKIT-06S2-AI)" device="4">
+        <Int32Argument param="use case_1">1</Int32Argument>
+      </DeviceNode>
+    </Nodes>
+    <Connections>
+      <Connection>
+        <Source node="node_0" param="Radar" />
+        <Target node="node_1" param="data" />
+      </Connection>
+      <Connection>
+        <Source node="node_15" param="output" />
+        <Target node="node_16" param="input" />
+      </Connection>
+      <Connection>
+        <Source node="node_0" param="Radar" />
+        <Target node="node_15" param="input" />
+      </Connection>
+      <Connection>
+        <Source node="node_16" param="output" />
+        <Target node="node_6" param="data" />
+      </Connection>
+      <Connection>
+        <Source node="node_16" param="output" />
+        <Target node="node_5" param="data" />
+      </Connection>
+    </Connections>
+  </Compound>
+</Imaginet>

@@ -1,0 +1,7 @@
+Time(Seconds),Length(Seconds),Label(string),Confidence(double),Comment(string)
+0.5454545,1.5151515,click,1,
+2.8181818,1.3939394000000003,right,1,
+5,1.4545453999999998,left,1,
+7.3636363,1.4848485,right,1,
+9.6666666,1.5151515,left,1,
+12.1212121,1.3939394000000007,click,1,
