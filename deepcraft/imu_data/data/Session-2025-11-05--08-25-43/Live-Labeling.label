@@ -1,0 +1,5 @@
+Time(Seconds),Length(Seconds),Label(string),Confidence(double),Comment(string)
+0.6,1.6,left,1,
+2.96,1.7800000000000002,square,1,
+5.74,1.6399999999999997,circle,1,
+8.1199999,1.5,right,1,

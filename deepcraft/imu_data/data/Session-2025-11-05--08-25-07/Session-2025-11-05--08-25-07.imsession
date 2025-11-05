@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<ImagimobStudio version="0.9">
+  <Timeline id="66dd17d8-98be-4f86-888e-39c96c5d4f77">
+    <Tracks>
+      <Track name="Live Labeling" type="labelcsv">
+        <PayloadFile>Live-Labeling.label</PayloadFile>
+        <Shape />
+      </Track>
+      <Track name="Concatenate Data" type="datacsv" timecoded="TimestampBegin" isLabelTrack="False" frequency="50">
+        <PayloadFile>Concatenate-Data.data</PayloadFile>
+        <Offset unit="seconds">9.9999000000E-003</Offset>
+        <Shape>
+          <Axis name="" size="6" />
+          <Axis name="" size="1" />
+        </Shape>
+      </Track>
+    </Tracks>
+  </Timeline>
+</ImagimobStudio>
