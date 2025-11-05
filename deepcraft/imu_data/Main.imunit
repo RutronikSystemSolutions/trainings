@@ -1,0 +1,56 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<Imaginet version="2.0.0.0">
+  <Compound unit="d419d86b-7b57-41d3-9a74-ab428f13a213">
+    <Nodes>
+      <LabelListNode id="node_6" width="120" height="120" x="809.518904180595" y="-10.679962761486905" enabled="true" profiling="false" name="Predefined Labels">
+        <Label>square</Label>
+        <Label>circle</Label>
+        <Label>left</Label>
+        <Label>right</Label>
+      </LabelListNode>
+      <UnitNode id="node_1" x="441.20000000000005" y="129.99999999999997" enabled="true" profiling="false" name="Select acc data" unit="Imaginet.Units.Math.Select">
+        <Int32Argument param="count">1</Int32Argument>
+        <Int32Argument param="axis">1</Int32Argument>
+      </UnitNode>
+      <UnitNode id="node_3" x="686.8420425531915" y="279.12187234042534" enabled="true" profiling="false" name="Divide by 100" unit="Imaginet.Units.Math.Scale">
+        <DoubleArgument param="scale">0.01</DoubleArgument>
+      </UnitNode>
+      <DeviceNode id="node_0" x="68.40000000000009" y="205.20000000000005" enabled="true" profiling="false" name="IMU" board="290de5cb-460b-41bf-f484-8c17112faff5" boardName="PSOC 6 AI (CY8CKIT-06S2-AI)" device="1">
+        <Int32Argument param="accel range_2">0</Int32Argument>
+      </DeviceNode>
+      <UnitNode id="node_5" x="1190.7014446228611" y="156.38152101259283" enabled="true" profiling="false" name="Concatenate Data" unit="ImagimobStudio.Modules.DataTrack" />
+      <UnitNode id="node_2" x="440.4" y="273.99999999999994" enabled="true" profiling="false" name="Select gyr data" unit="Imaginet.Units.Math.Select">
+        <Int32Argument param="count">1</Int32Argument>
+        <Int32Argument param="index">1</Int32Argument>
+        <Int32Argument param="axis">1</Int32Argument>
+      </UnitNode>
+      <UnitNode id="node_4" x="935.78377042801" y="156.31330947133026" enabled="true" profiling="false" unit="Imaginet.Units.Math.Concat" />
+    </Nodes>
+    <Connections>
+      <Connection>
+        <Source node="node_0" param="Combined" />
+        <Target node="node_1" param="input" />
+      </Connection>
+      <Connection>
+        <Source node="node_0" param="Combined" />
+        <Target node="node_2" param="input" />
+      </Connection>
+      <Connection>
+        <Source node="node_2" param="output" />
+        <Target node="node_3" param="input" />
+      </Connection>
+      <Connection>
+        <Source node="node_1" param="output" />
+        <Target node="node_4" param="i0" />
+      </Connection>
+      <Connection>
+        <Source node="node_3" param="output" />
+        <Target node="node_4" param="i1" />
+      </Connection>
+      <Connection>
+        <Source node="node_4" param="output" />
+        <Target node="node_5" param="data" />
+      </Connection>
+    </Connections>
+  </Compound>
+</Imaginet>
