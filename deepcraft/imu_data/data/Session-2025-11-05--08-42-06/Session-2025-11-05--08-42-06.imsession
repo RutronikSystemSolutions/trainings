@@ -2,17 +2,16 @@
 <ImagimobStudio version="0.9">
   <Timeline id="09443788-0817-4314-b15f-453f327c6450">
     <Tracks>
-      <Track name="Live Labeling" type="labelcsv">
-        <PayloadFile>Live-Labeling.label</PayloadFile>
-        <Shape />
-      </Track>
-      <Track name="Concatenate Data" type="datacsv" timecoded="TimestampBegin" isLabelTrack="False" frequency="50">
+      <Track name="Concatenate Data" type="datacsv" isLabelTrack="False">
         <PayloadFile>Concatenate-Data.data</PayloadFile>
-        <Offset unit="seconds">9.9999000000E-003</Offset>
         <Shape>
           <Axis name="" size="6" />
           <Axis name="" size="1" />
         </Shape>
+      </Track>
+      <Track name="Live Labeling" type="labelcsv">
+        <PayloadFile>Live-Labeling.label</PayloadFile>
+        <Shape />
       </Track>
     </Tracks>
   </Timeline>

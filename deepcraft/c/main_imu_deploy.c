@@ -1,10 +1,8 @@
 /******************************************************************************
 * File Name:   main.c
 *
-* Description: Implementation of Tensor Streaming Protocol firmware for PSOC 6.
-*
-* Related Document:
-*    See README.md and https://bitbucket.org/imagimob/tensor-streaming-protocol
+* Description: Deployment of IMU model generated using Deepcraft Studio
+* on PSoC 6
 *
 *******************************************************************************
 * Copyright 2024-2025, Cypress Semiconductor Corporation (an Infineon company) or
@@ -37,6 +35,14 @@
 * including Cypress's product in a High Risk Product, the manufacturer
 * of such system or application assumes all risk of such use and in doing
 * so agrees to indemnify Cypress against all liability.
+*
+* Rutronik Elektronische Bauelemente GmbH Disclaimer: The evaluation board
+* including the software is for testing purposes only and,
+* because it has limited functions and limited resilience, is not suitable
+* for permanent use under real conditions. If the evaluation board is
+* nevertheless used under real conditions, this is done at one’s responsibility;
+* any liability of Rutronik is insofar excluded
+*
 *******************************************************************************/
 
 #include <string.h>
@@ -58,7 +64,17 @@
 #include <bmi270.h>
 #include "dev_bmi270.h"
 
+#include "FreeRTOS.h"
+#include "task.h"
+#include "queue.h"
+
+#include "model.h"
+
 // Add those modules in your makefile
+// For FreeRTOS
+// COMPONENTS+=FREERTOS
+//
+// For model deployment
 // COMPONENTS+=ML_TFLM ML_FLOAT32
 // DEFINES+=TF_LITE_STATIC_MEMORY
 
@@ -379,6 +395,78 @@ static bool _config_hw(dev_bmi270_t* dev, int rate, int accel_range, int gyro_ra
    return false;
 }
 
+QueueHandle_t data_queue = NULL;
+
+void imu_collection_task(void* params)
+{
+	const TickType_t delay_time = 5 / portTICK_PERIOD_MS;
+
+	for(;;)
+	{
+		if (_read_hw(&bmi270_dev))
+		{
+			// Divide gyr by 100
+			for (int i = 3; i < 6; ++i)
+			{
+				bmi270_dev.data_combined[i] = bmi270_dev.data_combined[i] * 0.01f;
+			}
+
+			// Send to queue
+			if (xQueueSend(data_queue, bmi270_dev.data_combined, 0) != pdPASS)
+			{
+				printf("Cannot send to queue\r\n");
+				return;
+			}
+		}
+
+		// Small sleep (1/50Hz -> 20ms) -> sleep 5 ms
+		vTaskDelay(delay_time);
+	}
+}
+
+void inference_task(void* params)
+{
+	float raw_data[6];
+	float data_out[IMAI_DATA_OUT_COUNT];
+	for(;;)
+	{
+		if (xQueueReceive(data_queue, raw_data, portMAX_DELAY) != pdPASS)
+		{
+			printf("Cannot read from queue\r\n");
+			return;
+		}
+
+		if (IMAI_enqueue(raw_data) != 0)
+		{
+			printf("IMAI enqueue error...\r\n");
+			return;
+		}
+
+		clock_tick_t start_time = clock_get_tick();
+
+		switch(IMAI_dequeue(data_out))
+		{
+			case IMAI_RET_SUCCESS:
+				clock_tick_t stop_time = clock_get_tick();
+				printf("Dequeue takes: %d ms\r\n",
+				(int)((((float)(stop_time - start_time) / (float)CLOCK_TICK_PER_SECOND)) * 1000.f));
+
+				for (int i = 0; i < IMAI_DATA_OUT_COUNT; ++i)
+				{
+					printf("%.1f\t", data_out[i]);
+				}
+				printf("\r\n");
+
+				break;
+			case IMAI_RET_NODATA:
+				break;
+			default:
+				printf("IMAI dequeue error..\r\n");
+				return;
+		}
+	}
+}
+
 /*******************************************************************************
 * Function Name: main
 ********************************************************************************
@@ -426,13 +514,35 @@ int main(void)
     	return 0;
     }
 
-    for(;;)
+    if (IMAI_init() != 0)
     {
-    	if (_read_hw(&bmi270_dev))
-    	{
-    		printf("Val = %f\r\n", bmi270_dev.data_combined[0]);
-    	}
+    	printf("Cannot init model...\r\n");
+    	return 0;
     }
+
+    // Create queue
+    data_queue = xQueueCreate(100, 6 * sizeof(float));
+
+    // Create tasks
+    xTaskCreate(inference_task,
+    		"inference_task",
+			configMINIMAL_STACK_SIZE * 16,
+			NULL,
+			configMAX_PRIORITIES - 2,
+			NULL);
+
+    xTaskCreate(imu_collection_task,
+    		"imu_task",
+			configMINIMAL_STACK_SIZE * 8,
+			NULL,
+			configMAX_PRIORITIES - 1,
+			NULL);
+
+    vTaskStartScheduler();
+
+    printf("oops\r\n");
+
+    return 0;
 }
 
 /* [] END OF FILE */
